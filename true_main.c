@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/18 16:52:20 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/18 19:55:40 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void		raytracing(t_camera cam, t_big *big)
 	double		b;
 	double		c;
 
-	boule_pos.x = 0;
+	boule_pos.x = 20;
 	boule_pos.y = 0;
 	boule_pos.z = 0;
 	boule_rayon = 20;
@@ -66,22 +66,18 @@ void		raytracing(t_camera cam, t_big *big)
 		{
 			b = 2 * (ang.x * (cam.origin.x - boule_pos.x) +
 							ang.y * (cam.origin.y - boule_pos.y) +
-							ang.z * (cam.origin.z -
-							boule_pos.z));
+							ang.z * (cam.origin.z - boule_pos.z));
 			a = scalar_product(ang, ang);
 			c = ((pow(cam.origin.x - boule_pos.x, (double)2) +
-							pow(cam.origin.y - boule_pos.y,(double)2) +
-							pow(cam.origin.z - boule_pos.z, (double)2))
-							- pow(boule_rayon, (double)2));
+							pow(cam.origin.y - boule_pos.y, (double)2) +
+							pow(cam.origin.z - boule_pos.z, (double)2)))
+							- pow(boule_rayon, (double)2);
 			a = pow(b, (double)2) - (4 * a * c);
 			if (a >= 0)
-				ft_putchar('0');
-			else
-				ft_putchar(' ');
+				print_pixel(&(big->img), &screen, 0);
 			screen.y++;
 			ang.y -= pas.y;
 		}
-		ft_putchar('\n');
 		screen.x++;
 		ang.x += pas.x * cam.vec_horizon.x;
 		ang.z += pas.z * cam.vec_horizon.z;
@@ -99,6 +95,13 @@ t_camera	init_cam(t_camera cam)
 	return (cam);
 }
 
+int     quit_button(t_big *big)
+{
+	big += 0;
+	exit(EXIT_SUCCESS);
+	return (0);
+}
+
 int			main()
 {
 	t_big big;
@@ -109,7 +112,7 @@ int			main()
 	big.camera.direction.x = -1;
 	big.camera.direction.y = 0;
 	big.camera.direction.z = 0;
-	big.camera.distance = (WINDOW_X / 2) / (tan(RAD(FOVX / 2)));
+	big.camera.distance = 40;
 	big.camera.vec_horizon.x = -big.camera.direction.z;
 	big.camera.vec_horizon.y = 0;
 	big.camera.vec_horizon.z = -big.camera.direction.x;
@@ -121,9 +124,11 @@ int			main()
 	big.camera.vec_horizon = normalize(big.camera.vec_horizon);
 	big.camera.vec_vertic = normalize(big.camera.vec_vertic);
 	big.camera = init_cam(big.camera);
-//	big.mlx.mlx = mlx_init();
-//	window_creation(&(big.img), &(big.mlx), &big);
+	big.mlx.mlx = mlx_init();
+	window_creation(&(big.img), &(big.mlx), &big);
 	raytracing(big.camera, &big);
-//	mlx_put_image_to_window(big.mlx.mlx, big.mlx.win, big.mlx.image, 0, 0);
+	mlx_put_image_to_window(big.mlx.mlx, big.mlx.win, big.mlx.image, 0, 0);
+	mlx_hook(big.mlx.win, 17, 0, quit_button, &big);
+	mlx_loop(big.mlx.mlx);
 	return (0);
 }

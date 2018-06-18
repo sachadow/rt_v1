@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/13 18:09:19 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/18 19:30:18 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 
 # define ABS(x) ((x) > 0 ? x : -(x))
 # define RAD(x) ((double)(x) / 57.3)
-# define WINDOW_X 30
-# define WINDOW_Y 20
+# define WINDOW_X 800
+# define WINDOW_Y 800
 # define FOVX 60
-# define FOVY 40
+# define FOVY 60
 
 typedef struct	s_pos
 {
