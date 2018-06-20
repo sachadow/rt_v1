@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/19 17:13:55 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/20 19:27:15 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,14 @@ typedef struct	s_char
 	t_dpos3d	vecdir;
 	t_dpos3d	vec_horizon;
 	t_dpos3d	vec_vertic;
+	t_dpos3d	vec_yz;
 	int			distance;
 }				t_camera;
 
 typedef struct	s_ray
 {
 	t_dpos3d	origin;
-	t_dpos		direction;
+	t_dpos3d	direction;
 	t_dpos3d	vecdir;
 	int			distance;
 }				t_ray;
@@ -108,7 +109,7 @@ typedef struct	s_big
 {
 	t_image	img;
 	t_mmlx	mlx;
-	t_camera camera;;
+	t_camera camera;
 	t_map	map;
 	char	*name;
 }				t_big;

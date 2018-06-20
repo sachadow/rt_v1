@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/19 19:45:04 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/20 19:35:21 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,16 @@ void		raytracing(t_camera cam, t_big *big)
 	t_dpos3d	ang;
 	t_dpos3d	normalized_ang;
 	t_dpos3d	relative;
+	t_dpos3d	intersection;
 	double		a;
 	double		b;
 	double		c;
+	int			colo[3];
+	t_ray		light;
 
+	light.origin.x = 10;
+	light.origin.z = -20;
+	light.origin.y = 20;
 	boule_pos.x = 100;
 	boule_pos.y = 0;
 	boule_pos.z = 0;
@@ -53,11 +59,12 @@ void		raytracing(t_camera cam, t_big *big)
 	relative.x = -cam.origin.x + boule_pos.x;
 	relative.y = -cam.origin.y + boule_pos.y;
 	relative.z = -cam.origin.z + boule_pos.z;
-	ang.x = cam.upleft.x;
-	ang.y = cam.upleft.y;
-	ang.z = cam.upleft.z;
+	ang.x = cam.upleft.x - cam.origin.x;
+	ang.y = cam.upleft.y - cam.origin.y;
+	ang.z = cam.upleft.z - cam.origin.z;
 	petit_pas.x = cam.vec_vertic.x * ((double)FOVX / (double)WINDOW_X);
-	petit_pas.y = cam.vec_vertic.y * ((double)FOVY / (double)WINDOW_Y);
+	petit_pas.y = (cam.vec_vertic.y)
+		* ((double)FOVY / (double)WINDOW_Y);
 	petit_pas.z = cam.vec_vertic.z * ((double)FOVX / (double)WINDOW_X);
 	pas.x = cam.vec_horizon.x * ((double)FOVX / (double)WINDOW_X);
 	pas.z = cam.vec_horizon.z * ((double)FOVX / (double)WINDOW_X);
@@ -70,33 +77,38 @@ void		raytracing(t_camera cam, t_big *big)
 	ft_putchar('\n');
 	while (screen.x < WINDOW_X)
 	{
-		screen.y = WINDOW_Y - 1;
-		ang.y = cam.upleft.y;
-		ang.x = cam.upleft.x + (pas.x * screen.x);
-		ang.z = cam.upleft.z + (pas.z * screen.x);
-		while (screen.y >= 0)
+		screen.y = 0;
+		ang.y = cam.upleft.y - cam.origin.y;
+		ang.x = cam.upleft.x - cam.origin.x + (pas.x * screen.x);
+		ang.z = cam.upleft.z - cam.origin.z + (pas.z * screen.x);
+		while (screen.y < WINDOW_Y)
 		{
-/*
-			b = 2 * (ang.x * (cam.origin.x - boule_pos.x) +
-							ang.y * (cam.origin.y - boule_pos.y) +
-							ang.z * (cam.origin.z - boule_pos.z));
-			a = scalar_product(ang, ang);
-			c = ((pow(cam.origin.x - boule_pos.x, (double)2) +
-							pow(cam.origin.y - boule_pos.y, (double)2) +
-							pow(cam.origin.z - boule_pos.z, (double)2)))
-							- pow(boule_rayon, (double)2);
-			a = pow(b, (double)2) - (4 * a * c);
-			if (a >= 0)
-				print_pixel(&(big->img), &screen, 0);
-*/
 			normalized_ang = normalize(ang);
 			a = scalar_product(relative, normalized_ang);
 			b = pow(boule_rayon, (double)2) - (scalar_product(relative, relative)
 						- pow(a, (double)2));
 			if (b >= 0)
-				print_pixel(&(big->img), &screen, 0);
-
-			screen.y--;
+			{
+				c = sqrt(b);
+				intersection.x = cam.origin.x + (a - c) * ang.x;
+				intersection.y = cam.origin.y + (a - c) * ang.y;
+				intersection.z = cam.origin.z + (a - c) * ang.z;
+				light.direction.x = intersection.x - light.origin.x;
+				light.direction.y = intersection.y - light.origin.y;
+				light.direction.z = intersection.z - light.origin.z;
+				intersection.x = intersection.x - boule_pos.x;
+				intersection.y = intersection.y - boule_pos.y;
+				intersection.z = intersection.z - boule_pos.z;
+				b = scalar_product(normalize(light.direction), intersection);
+				if (b < 0)
+					b = 0;
+				b *= 230;
+				colo[0] = b + 20;
+				colo[1] = b + 20;
+				colo[2] = b + 20;
+				print_pixel(&(big->img), &screen, colo);
+			}
+			screen.y++;
 			ang.x -= petit_pas.x;
 			ang.y -= petit_pas.y;
 			ang.z -= petit_pas.z;
@@ -131,12 +143,14 @@ int     quit_button(t_big *big)
 
 int			main()
 {
-	t_big big;
+	t_big		big;
+	t_camera	*cam;
 
-	big.camera.origin.x = 50;
+	cam = &(big.camera);
+	big.camera.origin.x = 0;
 	big.camera.origin.y = 0;
 	big.camera.origin.z = 0;
-	big.camera.direction.x = 100;
+	big.camera.direction.x = 1;
 	big.camera.direction.y = 0;
 	big.camera.direction.z = 0;
 	big.camera.distance = 40;
@@ -145,9 +159,15 @@ int			main()
 	big.camera.vec_horizon.z = big.camera.direction.x;
 	if (big.camera.vec_horizon.x == 0 && big.camera.vec_horizon.z == 0)
 		big.camera.vec_horizon.z = 1;
-	big.camera.vec_vertic.y = -big.camera.direction.x - big.camera.direction.z;
-	big.camera.vec_vertic.x = big.camera.direction.y;
-	big.camera.vec_vertic.z = big.camera.direction.y;
+//	big.camera.vec_vertic.y = big.camera.direction.x + big.camera.direction.z;
+//	big.camera.vec_vertic.x = -big.camera.direction.y;
+//	big.camera.vec_vertic.z = -big.camera.direction.y;
+	big.camera.vec_vertic.x = -((cam->direction.y * cam->vec_horizon.z) -
+		(cam->direction.z * cam->vec_horizon.y));
+	big.camera.vec_vertic.y = -((cam->direction.z * cam->vec_horizon.x) -
+		(cam->direction.x * cam->vec_horizon.z));
+	big.camera.vec_vertic.z = -((cam->direction.x * cam->vec_horizon.y) -
+		(cam->direction.y * cam->vec_horizon.x));
 	big.camera.vecdir = normalize(big.camera.direction);
 	big.camera.vec_horizon = normalize(big.camera.vec_horizon);
 	big.camera.vec_vertic = normalize(big.camera.vec_vertic);
