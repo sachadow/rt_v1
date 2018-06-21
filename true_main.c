@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/21 19:00:16 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/21 19:12:26 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,19 +32,20 @@ t_dpos3d	normalize(t_dpos3d pos)
 	return (res);
 }
 
-double		sphere_coup(t_primitiv sphere, t_dpos3d ang, double a, t_camera cam)
+double		sphere_coup(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
 {
 	t_dpos3d	normalized_ang;
 	double		b;
 	double		c;
+	t_dpos3d	relative;
 
 	normalized_ang = normalize(ang);
-	cam.relative.x = -cam.origin.x + sphere.origin.x;
-	cam.relative.y = -cam.origin.y + sphere.origin.y;
-	cam.relative.z = -cam.origin.z + sphere.origin.z;
-	a = scalar_product(cam.relative, normalized_ang);
+	relative.x = -origin.x + sphere.origin.x;
+	relative.y = -origin.y + sphere.origin.y;
+	relative.z = -origin.z + sphere.origin.z;
+	a = scalar_product(relative, normalized_ang);
 	b = pow(sphere.rayon, (double)2) -
-		(scalar_product(cam.relative, cam.relative) - pow(a, (double)2));
+		(scalar_product(relative, relative) - pow(a, (double)2));
 	if (b < 0)
 		return (-1);
 	c = sqrt(b);
@@ -87,10 +88,10 @@ void		raytracing(t_camera cam, t_big *big)
 		{
 			count = 0;
 			d = 0;
-			b = sphere_coup(big->objects[count], ang, 0, cam);
+			b = sphere_coup(big->objects[count], ang, 0, cam.origin);
 			while (big->objects[count].type)
 			{
-				c = sphere_coup(big->objects[count], ang, 0, cam);
+				c = sphere_coup(big->objects[count], ang, 0, cam.origin);
 				if ((c >= 0 && c < b) || b < 0)
 				{
 					b = c;
@@ -107,14 +108,26 @@ void		raytracing(t_camera cam, t_big *big)
 				light.direction.x = light.origin.x - cam.intersection.x;
 				light.direction.y = light.origin.y - cam.intersection.y;
 				light.direction.z = light.origin.z - cam.intersection.z;
-				cam.intersection.x = cam.intersection.x - big->objects[d].origin.x;
-				cam.intersection.y = cam.intersection.y - big->objects[d].origin.y;
-				cam.intersection.z = cam.intersection.z - big->objects[d].origin.z;
+				cam.intersection_d.x = cam.intersection.x - big->objects[d].origin.x;
+				cam.intersection_d.y = cam.intersection.y - big->objects[d].origin.y;
+				cam.intersection_d.z = cam.intersection.z - big->objects[d].origin.z;
 				light.direction = normalize(light.direction);
-				cam.intersection = normalize(cam.intersection);
-				b = scalar_product(light.direction, cam.intersection) * 0.8;
+				cam.intersection_d = normalize(cam.intersection_d);
+				b = scalar_product(light.direction, cam.intersection_d) * 0.8;
 				if (b < 0)
 					b = 0;
+				count = 0;
+				while (big->objects[count].type)
+				{
+					if (count != d)
+					{
+						a = sphere_coup(big->objects[count],
+								light.direction, 0, cam.intersection);
+						if (a >= 0)
+							b = 0;
+					}
+					count++;
+				}
 				cam.point_colo[0] = big->objects[d].color.b * (0.2 + b);
 				cam.point_colo[1] = big->objects[d].color.g * (0.2 + b);
 				cam.point_colo[2] = big->objects[d].color.r * (0.2 + b);
@@ -167,8 +180,8 @@ int			main()
 	big.objects[1].origin.y = 20;
 	big.objects[1].origin.z = 0;
 	big.objects[1].rayon = 20;
-	big.objects[1].color.r = 255;
-	big.objects[1].color.g = 123;
+	big.objects[1].color.r = 123;
+	big.objects[1].color.g = 255;
 	big.objects[1].color.b = 68;
 	big.objects[2].type = 0;
 	big.camera.origin.x = 0;

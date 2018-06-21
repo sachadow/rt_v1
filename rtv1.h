@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/21 16:39:44 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/21 19:12:00 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ typedef struct	s_char
 	int			distance;
 	t_dpas		pas;
 	t_dpos3d	intersection;
+	t_dpos3d	intersection_d;
 	t_dpos3d	relative;
 	int			point_colo[3];
 }				t_camera;
