@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/20 19:27:15 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/21 16:39:44 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,13 @@ typedef struct	s_dpos3d
 	double	z;
 }				t_dpos3d;
 
+typedef struct	s_color
+{
+	int	r;
+	int	g;
+	int	b;
+}				t_color;
+
 typedef struct	s_map
 {
 	int	**map;
@@ -85,16 +92,25 @@ typedef struct	s_map
 	int distance;
 }				t_map;
 
+typedef	struct	s_dpas
+{
+	t_dpos3d	first_p;
+	t_dpos3d	second_p;
+}				t_dpas;
+
 typedef struct	s_char
 {
 	t_dpos3d	origin;
 	t_dpos3d	direction;
 	t_dpos3d	upleft;
 	t_dpos3d	vecdir;
-	t_dpos3d	vec_horizon;
+	t_dpos3d	vec_horiz;
 	t_dpos3d	vec_vertic;
-	t_dpos3d	vec_yz;
 	int			distance;
+	t_dpas		pas;
+	t_dpos3d	intersection;
+	t_dpos3d	relative;
+	int			point_colo[3];
 }				t_camera;
 
 typedef struct	s_ray
@@ -105,13 +121,23 @@ typedef struct	s_ray
 	int			distance;
 }				t_ray;
 
+typedef	struct	s_primitiv
+{
+	char		*type;
+	t_dpos3d	origin;
+	double		rayon;
+	t_color		color;
+}				t_primitiv;
+
 typedef struct	s_big
 {
-	t_image	img;
-	t_mmlx	mlx;
-	t_camera camera;
-	t_map	map;
-	char	*name;
+	t_image		img;
+	t_mmlx		mlx;
+	t_camera	 camera;
+	t_map		map;
+	char		*name;
+	t_primitiv	*objects;
+	t_ray		*lights;
 }				t_big;
 
 void			init_big(t_big *big);
