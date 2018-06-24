@@ -100,6 +100,15 @@ double		plan_c(t_primitiv plan, t_dpos3d ang, double a, t_dpos3d origin)
 	return (a);
 }
 
+double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
+{
+	t_dpos3d	npos;
+	t_dpos3d	nang;
+
+	npos = soustraction_v(origin, cyl.origin);
+	nang = soustraction_v(normalize(ang), normalize(cyl.normale)); 
+}
+
 void		raytracing(t_camera cam, t_big *big)
 {
 	t_pos		screen;
