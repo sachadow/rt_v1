@@ -19,8 +19,8 @@
 
 # define ABS(x) ((x) > 0 ? x : -(x))
 # define RAD(x) ((double)(x) / 57.3)
-# define WINDOW_X 1000
-# define WINDOW_Y 1000
+# define WINDOW_X 800
+# define WINDOW_Y 800
 # define FOVX 60
 # define FOVY 60
 
@@ -124,9 +124,10 @@ typedef struct	s_ray
 
 typedef	struct	s_primitiv
 {
-	char		*type;
+	int			type;
 	t_dpos3d	origin;
 	double		rayon;
+	t_dpos3d	normale;
 	t_color		color;
 }				t_primitiv;
 
@@ -134,11 +135,12 @@ typedef struct	s_big
 {
 	t_image		img;
 	t_mmlx		mlx;
-	t_camera	 camera;
+	t_camera	camera;
 	t_map		map;
 	char		*name;
 	t_primitiv	*objects;
 	t_ray		*lights;
+	double		(*intersec[2])(t_primitiv, t_dpos3d, double, t_dpos3d);
 }				t_big;
 
 void			init_big(t_big *big);

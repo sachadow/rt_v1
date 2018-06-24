@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <float.h>
 #include <math.h>
 #include "rtv1.h"
 #include "libft/libft.h"
@@ -18,6 +19,35 @@
 double		scalar_product(t_dpos3d a, t_dpos3d b)
 {
 	return ((a.x * b.x) + (a.y * b.y) + (a.z * b.z));
+}
+
+t_dpos3d	copy_v(t_dpos3d pos)
+{
+	return (pos);
+}
+
+t_dpos3d	addition_v(t_dpos3d pos1, t_dpos3d pos2)
+{
+	pos1.x += pos2.x;
+	pos1.y += pos2.y;
+	pos1.z += pos2.z;
+	return (pos1);
+}
+
+t_dpos3d	soustraction_v(t_dpos3d pos1, t_dpos3d pos2)
+{
+	pos1.x -= pos2.x;
+	pos1.y -= pos2.y;
+	pos1.z -= pos2.z;
+	return (pos1);
+}
+
+t_dpos3d	multiplication_v(t_dpos3d pos1, double a)
+{
+	pos1.x *= a;
+	pos1.y *= a;
+	pos1.z *= a;
+	return (pos1);
 }
 
 t_dpos3d	normalize(t_dpos3d pos)
@@ -32,7 +62,7 @@ t_dpos3d	normalize(t_dpos3d pos)
 	return (res);
 }
 
-double		sphere_coup(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
+double		sphere_c(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
 {
 	t_dpos3d	normalized_ang;
 	double		b;
@@ -52,6 +82,24 @@ double		sphere_coup(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
 	return (a - c);
 }
 
+double		plan_c(t_primitiv plan, t_dpos3d ang, double a, t_dpos3d origin)
+{
+	t_dpos3d	relative;
+	t_dpos3d	normalized_ang;
+
+	a = FLT_MIN;
+	normalized_ang = normalize(ang);
+	plan.normale = normalize(plan.normale);
+	a = scalar_product(plan.normale, normalized_ang);
+	if (a >= -FLT_MIN && a <= FLT_MIN)
+		return (-1);
+	relative = soustraction_v(plan.origin, origin);
+	a = scalar_product(relative, plan.normale) / a;
+	if (a < 0)
+		return (-1);
+	return (a);
+}
+
 void		raytracing(t_camera cam, t_big *big)
 {
 	t_pos		screen;
@@ -63,18 +111,13 @@ void		raytracing(t_camera cam, t_big *big)
 	int			d;
 	int			count;
 	int			second_count;
-	t_ray		light;
+	t_primitiv	light;
 
 	light.origin.x = 30;
 	light.origin.z = -20;
-	light.origin.y = 20;
-	ang.x = cam.upleft.x - cam.origin.x;
-	ang.y = cam.upleft.y - cam.origin.y;
-	ang.z = cam.upleft.z - cam.origin.z;
-	cam.pas.second_p.x = cam.vec_vertic.x * ((double)FOVX / (double)WINDOW_X);
-	cam.pas.second_p.y = (cam.vec_vertic.y)
-		* ((double)FOVY / (double)WINDOW_Y);
-	cam.pas.second_p.z = cam.vec_vertic.z * ((double)FOVX / (double)WINDOW_X);
+	light.origin.y = 10;
+	ang = soustraction_v(cam.upleft, cam.origin);
+	cam.pas.second_p = multiplication_v(cam.vec_vertic, ((double)FOVX / (double)WINDOW_X));
 	cam.pas.first_p.x = cam.vec_horiz.x * ((double)FOVX / (double)WINDOW_X);
 	cam.pas.first_p.z = cam.vec_horiz.z * ((double)FOVX / (double)WINDOW_X);
 	screen.x = 0;
@@ -88,10 +131,11 @@ void		raytracing(t_camera cam, t_big *big)
 		{
 			count = 0;
 			d = 0;
-			b = sphere_coup(big->objects[count], ang, 0, cam.origin);
+			if (big->objects[0].type)
+				b = big->intersec[big->objects[count].type - 1](big->objects[count], ang, 0, cam.origin);
 			while (big->objects[count].type)
 			{
-				c = sphere_coup(big->objects[count], ang, 0, cam.origin);
+				c = big->intersec[big->objects[count].type - 1](big->objects[count], ang, 0, cam.origin);
 				if ((c >= 0 && c < b) || b < 0)
 				{
 					b = c;
@@ -102,28 +146,27 @@ void		raytracing(t_camera cam, t_big *big)
 			normalized_ang = normalize(ang);
 			if (b >= 0)
 			{
-				cam.intersection.x = cam.origin.x + (b) * normalized_ang.x;
-				cam.intersection.y = cam.origin.y + (b) * normalized_ang.y;
-				cam.intersection.z = cam.origin.z + (b) * normalized_ang.z;
-				light.direction.x = light.origin.x - cam.intersection.x;
-				light.direction.y = light.origin.y - cam.intersection.y;
-				light.direction.z = light.origin.z - cam.intersection.z;
-				cam.intersection_d.x = cam.intersection.x - big->objects[d].origin.x;
-				cam.intersection_d.y = cam.intersection.y - big->objects[d].origin.y;
-				cam.intersection_d.z = cam.intersection.z - big->objects[d].origin.z;
-				light.direction = normalize(light.direction);
+				cam.intersection = addition_v(cam.origin, multiplication_v(normalized_ang, b));
+				light.normale = soustraction_v(light.origin, cam.intersection);
+				cam.intersection_d = soustraction_v(cam.intersection, big->objects[d].origin);
+				light.normale = normalize(light.normale);
 				cam.intersection_d = normalize(cam.intersection_d);
-				b = scalar_product(light.direction, cam.intersection_d) * 0.8;
+				if (big->objects[d].type == 1)
+					b = scalar_product(light.normale, cam.intersection_d) * 0.8;
+				else if (big->objects[d].type == 2)
+					b = ABS(scalar_product(light.normale, normalize(big->objects[d].normale)) * 0.8);
 				if (b < 0)
 					b = 0;
 				count = 0;
+				c = big->intersec[1](light,
+					light.normale, 0, cam.intersection);
 				while (big->objects[count].type)
 				{
 					if (count != d)
 					{
-						a = sphere_coup(big->objects[count],
-								light.direction, 0, cam.intersection);
-						if (a >= 0)
+						a = big->intersec[big->objects[count].type - 1](big->objects[count],
+								light.normale, 0, cam.intersection);
+						if (a >= 0 && a < c)
 							b = 0;
 					}
 					count++;
@@ -134,9 +177,7 @@ void		raytracing(t_camera cam, t_big *big)
 				print_pixel(&(big->img), &screen, cam.point_colo);
 			}
 			screen.y++;
-			ang.x -= cam.pas.second_p.x;
-			ang.y -= cam.pas.second_p.y;
-			ang.z -= cam.pas.second_p.z;
+			ang = soustraction_v(ang, cam.pas.second_p);
 		}
 		screen.x++;
 	}
@@ -155,7 +196,7 @@ t_camera	init_cam(t_camera cam)
 
 int     quit_button(t_big *big)
 {
-	big += 0;
+	free(big->objects);
 	exit(EXIT_SUCCESS);
 	return (0);
 }
@@ -166,8 +207,8 @@ int			main()
 	t_camera	*cam;
 
 	cam = &(big.camera);
-	big.objects = (t_primitiv*)malloc(sizeof(t_primitiv) * 3);
-	big.objects[0].type = "sphere";
+	big.objects = (t_primitiv*)malloc(sizeof(t_primitiv) * 7);
+	big.objects[0].type = 1;
 	big.objects[0].origin.x = 100;
 	big.objects[0].origin.y = 0;
 	big.objects[0].origin.z = 0;
@@ -175,22 +216,64 @@ int			main()
 	big.objects[0].color.r = 255;
 	big.objects[0].color.g = 123;
 	big.objects[0].color.b = 68;
-	big.objects[1].type = "sphere";
-	big.objects[1].origin.x = 80;
+	big.objects[1].type = 1;
+	big.objects[1].origin.x = 85;
 	big.objects[1].origin.y = 20;
 	big.objects[1].origin.z = 0;
 	big.objects[1].rayon = 20;
 	big.objects[1].color.r = 123;
 	big.objects[1].color.g = 255;
 	big.objects[1].color.b = 68;
-	big.objects[2].type = 0;
-	big.camera.origin.x = 0;
-	big.camera.origin.y = 0;
+	big.objects[2].type = 2;
+	big.objects[2].origin.x = 200;
+	big.objects[2].origin.y = 0;
+	big.objects[2].origin.z = 0;
+	big.objects[2].normale.x = 10;
+	big.objects[2].normale.y = 0;
+	big.objects[2].normale.z = 0;
+	big.objects[2].color.r = 255;
+	big.objects[2].color.g = 255;
+	big.objects[2].color.b = 123;
+	big.objects[3].type = 2;
+	big.objects[3].origin.x = 0;
+	big.objects[3].origin.y = -10;
+	big.objects[3].origin.z = 0;
+	big.objects[3].normale.x = 0;
+	big.objects[3].normale.y = 20;
+	big.objects[3].normale.z = 0;
+	big.objects[3].color.r = 123;
+	big.objects[3].color.g = 68;
+	big.objects[3].color.b = 255;
+	big.objects[4].type = 2;
+	big.objects[4].origin.x = 0;
+	big.objects[4].origin.y = 0;
+	big.objects[4].origin.z = 50;
+	big.objects[4].normale.x = 0;
+	big.objects[4].normale.y = 0;
+	big.objects[4].normale.z = 10;
+	big.objects[4].color.r = 255;
+	big.objects[4].color.g = 255;
+	big.objects[4].color.b = 255;
+	big.objects[5].type = 2;
+	big.objects[5].origin.x = 0;
+	big.objects[5].origin.y = 0;
+	big.objects[5].origin.z = -50;
+	big.objects[5].normale.x = 0;
+	big.objects[5].normale.y = 0;
+	big.objects[5].normale.z = 10;
+	big.objects[5].color.r = 255;
+	big.objects[5].color.g = 255;
+	big.objects[5].color.b = 255;
+	big.objects[6].type = 0;
+	big.camera.origin.x = -50;
+	big.camera.origin.y = 10;
 	big.camera.origin.z = 0;
 	big.camera.direction.x = 5;
 	big.camera.direction.y = 0;
 	big.camera.direction.z = 0;
 	big.camera.distance = 40;
+	big.intersec[0] = &sphere_c;
+	big.intersec[1] = &plan_c;
 	big.camera.vec_horiz.x = -big.camera.direction.z;
 	big.camera.vec_horiz.y = 0;
 	big.camera.vec_horiz.z = big.camera.direction.x;
