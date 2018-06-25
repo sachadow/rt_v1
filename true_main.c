@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/21 19:12:26 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/25 20:38:55 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,45 @@ t_dpos3d	normalize(t_dpos3d pos)
 	return (res);
 }
 
+t_dpos3d	rotate_x_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
+{
+	t_dpos3d	tmp;
+
+	tmp.y = to_rotate.y * cos(coeff * rotation.x) +
+		to_rotate.z * -sin(coeff * rotation.x);
+	tmp.z = to_rotate.y * sin(coeff * rotation.x) +
+		to_rotate.z * cos(coeff * rotation.x);
+	to_rotate.y = tmp.y;
+	to_rotate.z = tmp.z;
+	return (to_rotate);
+}
+
+t_dpos3d	rotate_y_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
+{
+	t_dpos3d	tmp;
+
+	tmp.x = to_rotate.x * cos(coeff * rotation.y) +
+		to_rotate.z * sin(coeff * rotation.y);
+	tmp.z = to_rotate.x * -sin(coeff * rotation.y) +
+		to_rotate.z * cos(coeff * rotation.y);
+	to_rotate.x = tmp.x;
+	to_rotate.z = tmp.z;
+	return (to_rotate);
+}
+
+t_dpos3d	rotate_z_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
+{
+	t_dpos3d	tmp;
+
+	tmp.x = to_rotate.x * cos(coeff * rotation.z) +
+		to_rotate.y * -sin(coeff * rotation.z);
+	tmp.y = to_rotate.x * sin(coeff * rotation.z) +
+		to_rotate.y * cos(coeff * rotation.z);
+	to_rotate.x = tmp.x;
+	to_rotate.y = tmp.y;
+	return (to_rotate);
+}
+
 double		sphere_c(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
 {
 	t_dpos3d	normalized_ang;
@@ -102,11 +141,27 @@ double		plan_c(t_primitiv plan, t_dpos3d ang, double a, t_dpos3d origin)
 
 double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
 {
-	t_dpos3d	npos;
-	t_dpos3d	nang;
+	t_dpos3d	abc;
+	double		d;
+	t_dpos		res;
+	t_dpos3d	relative;
 
-	npos = soustraction_v(origin, cyl.origin);
-	nang = soustraction_v(normalize(ang), normalize(cyl.normale)); 
+	origin = soustraction_v(origin, cyl.origin);
+	ang = soustraction_v(ang, cyl.origin);
+	ang = rotate_x_v(ang, cyl.normale, 1);
+	ang = rotate_y_v(ang, cyl.normale, 1);
+	ang = rotate_z_v(ang, cyl.normale, 1);
+//	origin = rotate_x_v(origin, cyl.normale, 1);
+//	origin = rotate_y_v(origin, cyl.normale, 1);
+//	origin = rotate_z_v(origin, cyl.normale, 1);
+	abc.x = pow(ang.x, (double)2) + pow(ang.y, (double)2);
+	abc.y = 2 * (ang.x * origin.x + ang.y * origin.y);
+	abc.z = pow(origin.x, (double)2) + pow(origin.y, (double)2) -
+		pow(cyl.rayon, (double)2);
+	d = pow(abc.y, (double)2) - (4 * abc.x * abc.z);
+	res.x = (-abc.y + sqrt(d)) / (2 * abc.x);
+	res.y = (-abc.y - sqrt(d)) / (2 * abc.x);
+	return (res.x < res.y && res.x >= 0 ? res.x : res.y);
 }
 
 void		raytracing(t_camera cam, t_big *big)
@@ -155,12 +210,14 @@ void		raytracing(t_camera cam, t_big *big)
 			normalized_ang = normalize(ang);
 			if (b >= 0)
 			{
+				if (big->objects[d].type == 3)
+					d += 0;
 				cam.intersection = addition_v(cam.origin, multiplication_v(normalized_ang, b));
 				light.normale = soustraction_v(light.origin, cam.intersection);
 				cam.intersection_d = soustraction_v(cam.intersection, big->objects[d].origin);
 				light.normale = normalize(light.normale);
 				cam.intersection_d = normalize(cam.intersection_d);
-				if (big->objects[d].type == 1)
+				if (big->objects[d].type == 1 || big->objects[d].type == 3)
 					b = scalar_product(light.normale, cam.intersection_d) * 0.8;
 				else if (big->objects[d].type == 2)
 					b = ABS(scalar_product(light.normale, normalize(big->objects[d].normale)) * 0.8);
@@ -263,18 +320,19 @@ int			main()
 	big.objects[4].color.r = 255;
 	big.objects[4].color.g = 255;
 	big.objects[4].color.b = 255;
-	big.objects[5].type = 2;
-	big.objects[5].origin.x = 0;
+	big.objects[5].type = 3;
+	big.objects[5].origin.x = 50;
 	big.objects[5].origin.y = 0;
-	big.objects[5].origin.z = -50;
+	big.objects[5].origin.z = 0;
+	big.objects[5].rayon = 10;
 	big.objects[5].normale.x = 0;
-	big.objects[5].normale.y = 0;
-	big.objects[5].normale.z = 10;
+	big.objects[5].normale.y = -1;
+	big.objects[5].normale.z = 0;
 	big.objects[5].color.r = 255;
-	big.objects[5].color.g = 255;
+	big.objects[5].color.g = 0;
 	big.objects[5].color.b = 255;
 	big.objects[6].type = 0;
-	big.camera.origin.x = -50;
+	big.camera.origin.x = -150;
 	big.camera.origin.y = 10;
 	big.camera.origin.z = 0;
 	big.camera.direction.x = 5;
@@ -283,6 +341,7 @@ int			main()
 	big.camera.distance = 40;
 	big.intersec[0] = &sphere_c;
 	big.intersec[1] = &plan_c;
+	big.intersec[2] = &cyl_c;
 	big.camera.vec_horiz.x = -big.camera.direction.z;
 	big.camera.vec_horiz.y = 0;
 	big.camera.vec_horiz.z = big.camera.direction.x;
