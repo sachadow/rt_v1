@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/25 20:38:55 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/26 20:00:15 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,45 +62,6 @@ t_dpos3d	normalize(t_dpos3d pos)
 	return (res);
 }
 
-t_dpos3d	rotate_x_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
-{
-	t_dpos3d	tmp;
-
-	tmp.y = to_rotate.y * cos(coeff * rotation.x) +
-		to_rotate.z * -sin(coeff * rotation.x);
-	tmp.z = to_rotate.y * sin(coeff * rotation.x) +
-		to_rotate.z * cos(coeff * rotation.x);
-	to_rotate.y = tmp.y;
-	to_rotate.z = tmp.z;
-	return (to_rotate);
-}
-
-t_dpos3d	rotate_y_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
-{
-	t_dpos3d	tmp;
-
-	tmp.x = to_rotate.x * cos(coeff * rotation.y) +
-		to_rotate.z * sin(coeff * rotation.y);
-	tmp.z = to_rotate.x * -sin(coeff * rotation.y) +
-		to_rotate.z * cos(coeff * rotation.y);
-	to_rotate.x = tmp.x;
-	to_rotate.z = tmp.z;
-	return (to_rotate);
-}
-
-t_dpos3d	rotate_z_v(t_dpos3d to_rotate, t_dpos3d rotation, int coeff)
-{
-	t_dpos3d	tmp;
-
-	tmp.x = to_rotate.x * cos(coeff * rotation.z) +
-		to_rotate.y * -sin(coeff * rotation.z);
-	tmp.y = to_rotate.x * sin(coeff * rotation.z) +
-		to_rotate.y * cos(coeff * rotation.z);
-	to_rotate.x = tmp.x;
-	to_rotate.y = tmp.y;
-	return (to_rotate);
-}
-
 double		sphere_c(t_primitiv sphere, t_dpos3d ang, double a, t_dpos3d origin)
 {
 	t_dpos3d	normalized_ang;
@@ -146,22 +107,19 @@ double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
 	t_dpos		res;
 	t_dpos3d	relative;
 
-	origin = soustraction_v(origin, cyl.origin);
-	ang = soustraction_v(ang, cyl.origin);
-	ang = rotate_x_v(ang, cyl.normale, 1);
-	ang = rotate_y_v(ang, cyl.normale, 1);
-	ang = rotate_z_v(ang, cyl.normale, 1);
-//	origin = rotate_x_v(origin, cyl.normale, 1);
-//	origin = rotate_y_v(origin, cyl.normale, 1);
-//	origin = rotate_z_v(origin, cyl.normale, 1);
-	abc.x = pow(ang.x, (double)2) + pow(ang.y, (double)2);
-	abc.y = 2 * (ang.x * origin.x + ang.y * origin.y);
-	abc.z = pow(origin.x, (double)2) + pow(origin.y, (double)2) -
-		pow(cyl.rayon, (double)2);
-	d = pow(abc.y, (double)2) - (4 * abc.x * abc.z);
+	relative = soustraction_v(origin, cyl.origin);
+	ang = normalize(ang);
+	cyl.normale = normalize(cyl.normale);
+	abc.x = scalar_product(ang, ang) - pow(scalar_product(ang, cyl.normale),
+			(double)2);
+	abc.z = scalar_product(relative, relative) - pow(scalar_product(relative,
+					cyl.normale), (double)2) - (cyl.rayon * cyl.rayon);
+	abc.y = 2 * (scalar_product(ang, relative) - ((scalar_product(ang,
+					cyl.normale) * scalar_product(relative, cyl.normale))));
+	d = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
 	res.x = (-abc.y + sqrt(d)) / (2 * abc.x);
 	res.y = (-abc.y - sqrt(d)) / (2 * abc.x);
-	return (res.x < res.y && res.x >= 0 ? res.x : res.y);
+	return (res.x > 0 && res.x < res.y ? res.x : res.y);
 }
 
 void		raytracing(t_camera cam, t_big *big)
@@ -214,13 +172,28 @@ void		raytracing(t_camera cam, t_big *big)
 					d += 0;
 				cam.intersection = addition_v(cam.origin, multiplication_v(normalized_ang, b));
 				light.normale = soustraction_v(light.origin, cam.intersection);
-				cam.intersection_d = soustraction_v(cam.intersection, big->objects[d].origin);
+				if (big->objects[d].type == 1)
+					cam.intersection_d = soustraction_v(cam.intersection,
+							big->objects[d].origin);
+				else if (big->objects[d].type == 2)
+					cam.intersection_d = (scalar_product(ang,
+							big->objects[d].normale) < 0 ?
+							big->objects[d].normale : soustraction_v((t_dpos3d){0, 0, 0}, big->objects[d].normale));
+				else if (big->objects[d].type == 3)
+				{
+					big->objects[d].normale = normalize(big->objects[d].normale);
+					b = (scalar_product(normalized_ang, big->objects[d].normale)
+						* b) + scalar_product(soustraction_v(cam.origin,
+						big->objects[d].origin), big->objects[d].normale);
+					cam.intersection_d = soustraction_v(cam.intersection,
+						addition_v(big->objects[d].origin,
+						multiplication_v(normalize(big->objects[d].normale),
+						b)));
+				}
 				light.normale = normalize(light.normale);
 				cam.intersection_d = normalize(cam.intersection_d);
-				if (big->objects[d].type == 1 || big->objects[d].type == 3)
+				if (big->objects[d].type != 0)
 					b = scalar_product(light.normale, cam.intersection_d) * 0.8;
-				else if (big->objects[d].type == 2)
-					b = ABS(scalar_product(light.normale, normalize(big->objects[d].normale)) * 0.8);
 				if (b < 0)
 					b = 0;
 				count = 0;
@@ -321,13 +294,13 @@ int			main()
 	big.objects[4].color.g = 255;
 	big.objects[4].color.b = 255;
 	big.objects[5].type = 3;
-	big.objects[5].origin.x = 50;
+	big.objects[5].origin.x = 87;
 	big.objects[5].origin.y = 0;
-	big.objects[5].origin.z = 0;
+	big.objects[5].origin.z = -30;
 	big.objects[5].rayon = 10;
-	big.objects[5].normale.x = 0;
-	big.objects[5].normale.y = -1;
-	big.objects[5].normale.z = 0;
+	big.objects[5].normale.x = -2;
+	big.objects[5].normale.y = 10;
+	big.objects[5].normale.z = -2;
 	big.objects[5].color.r = 255;
 	big.objects[5].color.g = 0;
 	big.objects[5].color.b = 255;
