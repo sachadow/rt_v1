@@ -141,7 +141,7 @@ typedef struct	s_big
 	t_map		map;
 	char		*name;
 	t_primitiv	*objects;
-	t_ray		*lights;
+	t_primitiv	light;
 	double		(*intersec[4])(t_primitiv, t_dpos3d, double, t_dpos3d);
 }				t_big;
 
