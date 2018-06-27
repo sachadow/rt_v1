@@ -103,7 +103,6 @@ double		plan_c(t_primitiv plan, t_dpos3d ang, double a, t_dpos3d origin)
 double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
 {
 	t_dpos3d	abc;
-	double		d;
 	t_dpos		res;
 	t_dpos3d	relative;
 
@@ -116,9 +115,31 @@ double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
 					cyl.normale), (double)2) - (cyl.rayon * cyl.rayon);
 	abc.y = 2 * (scalar_product(ang, relative) - ((scalar_product(ang,
 					cyl.normale) * scalar_product(relative, cyl.normale))));
-	d = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
-	res.x = (-abc.y + sqrt(d)) / (2 * abc.x);
-	res.y = (-abc.y - sqrt(d)) / (2 * abc.x);
+	a = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
+	res.x = (-abc.y + sqrt(a)) / (2 * abc.x);
+	res.y = (-abc.y - sqrt(a)) / (2 * abc.x);
+	return (res.x > 0 && res.x < res.y ? res.x : res.y);
+}
+
+double		cone_c(t_primitiv cone, t_dpos3d ang, double a, t_dpos3d origin)
+{
+	t_dpos3d	abc;
+	t_dpos3d	relative;
+	t_dpos		res;
+
+	ang = normalize(ang);
+	cone.normale = normalize(cone.normale);
+	relative = soustraction_v(origin, cone.origin);
+	abc.x = scalar_product(ang, ang) - (1 + (cone.tangent * cone.tangent)) *
+		pow(scalar_product(ang, cone.normale), (double)2);
+	abc.y = 2 * (scalar_product(ang, relative) - (1 + pow(cone.tangent, 2)) *
+		scalar_product(ang, cone.normale) *
+		scalar_product(relative, cone.normale));
+	abc.z = scalar_product(relative, relative) - (1 + pow(cone.tangent, 2)) *
+		pow(scalar_product(relative, cone.normale), (double)2);
+	a = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
+	res.x = (-abc.y + sqrt(a)) / (2 * abc.x);
+	res.y = (-abc.y - sqrt(a)) / (2 * abc.x);
 	return (res.x > 0 && res.x < res.y ? res.x : res.y);
 }
 
@@ -168,8 +189,6 @@ void		raytracing(t_camera cam, t_big *big)
 			normalized_ang = normalize(ang);
 			if (b >= 0)
 			{
-				if (big->objects[d].type == 3)
-					d += 0;
 				cam.intersection = addition_v(cam.origin, multiplication_v(normalized_ang, b));
 				light.normale = soustraction_v(light.origin, cam.intersection);
 				if (big->objects[d].type == 1)
@@ -189,6 +208,18 @@ void		raytracing(t_camera cam, t_big *big)
 						addition_v(big->objects[d].origin,
 						multiplication_v(normalize(big->objects[d].normale),
 						b)));
+				}
+				else if (big->objects[d].type == 4)
+				{
+					big->objects[d].normale =
+						normalize(big->objects[d].normale);
+					b = (scalar_product(normalized_ang, big->objects[d].normale)
+						* b) + scalar_product(soustraction_v(cam.origin,
+						big->objects[d].origin), big->objects[d].normale);
+					cam.intersection_d = soustraction_v(cam.intersection,
+						addition_v(big->objects[d].origin,
+						multiplication_v(big->objects[d].normale, (1 +
+						pow(big->objects[d].tangent, 2)) * b)));
 				}
 				light.normale = normalize(light.normale);
 				cam.intersection_d = normalize(cam.intersection_d);
@@ -283,13 +314,14 @@ int			main()
 	big.objects[3].color.r = 123;
 	big.objects[3].color.g = 68;
 	big.objects[3].color.b = 255;
-	big.objects[4].type = 2;
-	big.objects[4].origin.x = 0;
-	big.objects[4].origin.y = 0;
+	big.objects[4].type = 4;
+	big.objects[4].origin.x = -30;
+	big.objects[4].origin.y = 30;
 	big.objects[4].origin.z = 50;
+	big.objects[4].tangent = 0.5;
 	big.objects[4].normale.x = 0;
-	big.objects[4].normale.y = 0;
-	big.objects[4].normale.z = 10;
+	big.objects[4].normale.y = 10;
+	big.objects[4].normale.z = 3;
 	big.objects[4].color.r = 255;
 	big.objects[4].color.g = 255;
 	big.objects[4].color.b = 255;
@@ -315,6 +347,7 @@ int			main()
 	big.intersec[0] = &sphere_c;
 	big.intersec[1] = &plan_c;
 	big.intersec[2] = &cyl_c;
+	big.intersec[3] = &cone_c;
 	big.camera.vec_horiz.x = -big.camera.direction.z;
 	big.camera.vec_horiz.y = 0;
 	big.camera.vec_horiz.z = big.camera.direction.x;

@@ -130,6 +130,7 @@ typedef	struct	s_primitiv
 	t_dpos3d	normale;
 	t_color		color;
 	double		length;
+	double		tangent;
 }				t_primitiv;
 
 typedef struct	s_big
@@ -141,7 +142,7 @@ typedef struct	s_big
 	char		*name;
 	t_primitiv	*objects;
 	t_ray		*lights;
-	double		(*intersec[3])(t_primitiv, t_dpos3d, double, t_dpos3d);
+	double		(*intersec[4])(t_primitiv, t_dpos3d, double, t_dpos3d);
 }				t_big;
 
 void			init_big(t_big *big);
