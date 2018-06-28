@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strsub.c                                        :+:      :+:    :+:   */
+/*   ft_strsubf.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/06/28 17:50:57 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 17:50:59 by sderet           ###   ########.fr       */
+/*   Created: 2018/06/28 16:58:31 by sderet            #+#    #+#             */
+/*   Updated: 2018/06/28 16:58:45 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strsub(char const *s, unsigned int start, size_t len)
+char	*ft_strsubf(char const *s, unsigned int start, size_t len)
 {
 	size_t	i;
 	size_t	j;
@@ -27,5 +27,6 @@ char	*ft_strsub(char const *s, unsigned int start, size_t len)
 	while (s[i] && j < len)
 		dst[j++] = s[i++];
 	dst[len] = '\0';
+	free((char *)s);
 	return (dst);
 }

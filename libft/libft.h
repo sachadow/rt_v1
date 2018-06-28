@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/08 16:04:45 by sderet            #+#    #+#             */
-/*   Updated: 2018/05/23 16:46:29 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/28 17:28:04 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 # define LIBFT_H
 
 # include <string.h>
+# include <unistd.h>
+# include <stdlib.h>
 
-# define BUFF_SIZE 32
+# define BUFF_SIZE 256
 
 typedef struct	s_list
 {
@@ -23,6 +25,10 @@ typedef struct	s_list
 	size_t			content_size;
 	struct s_list	*next;
 }				t_list;
+
+char			*ft_strsubf(char const *s, unsigned int start, size_t len);
+
+char			*ft_strjoinfree(char *s1, char *s2, int n);
 
 char			*ft_strlow(char *str);
 

@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/26 20:00:15 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/28 19:13:17 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ double		cyl_c(t_primitiv cyl, t_dpos3d ang, double a, t_dpos3d origin)
 					cyl.normale), (double)2) - (cyl.rayon * cyl.rayon);
 	abc.y = 2 * (scalar_product(ang, relative) - ((scalar_product(ang,
 					cyl.normale) * scalar_product(relative, cyl.normale))));
-	a = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
+	a = (abc.y * abc.y) - (4 * abc.x * abc.z);
 	if (a < 0)
 		return (-1);
 	res.x = (-abc.y + sqrt(a)) / (2 * abc.x);
@@ -137,7 +137,7 @@ double		cone_c(t_primitiv cone, t_dpos3d ang, double a, t_dpos3d origin)
 		scalar_product(relative, cone.normale));
 	abc.z = scalar_product(relative, relative) - (1 + pow(cone.tangent, 2)) *
 		pow(scalar_product(relative, cone.normale), (double)2);
-	a = (abc.y * abc.y) - ( 4 * abc.x * abc.z);
+	a = (abc.y * abc.y) - (4 * abc.x * abc.z);
 	if (a < 0)
 		return (-1);
 	res.x = (-abc.y + sqrt(a)) / (2 * abc.x);
@@ -145,7 +145,7 @@ double		cone_c(t_primitiv cone, t_dpos3d ang, double a, t_dpos3d origin)
 	return (res.x > 0 && res.x < res.y ? res.x : res.y);
 }
 
-double		test_intersections(t_big *big, double *b, t_camera cam, t_dpos3d ang)
+double		test_inter(t_big *big, double *b, t_camera cam, t_dpos3d ang)
 {
 	double	d;
 	double	c;
@@ -171,71 +171,94 @@ double		test_intersections(t_big *big, double *b, t_camera cam, t_dpos3d ang)
 	return (d);
 }
 
+double		light_intersections(t_big *big, int d, t_camera cam, double b)
+{
+	int		count;
+	double	c;
+	double	a;
+
+	count = 0;
+	c = big->intersec[1](big->light,
+		big->light.normale, 0, cam.intersection);
+	while (big->objects[count].type)
+	{
+		if (count != d)
+		{
+			a = big->intersec[big->objects[count].type - 1](big->objects[count],
+				big->light.normale, 0, cam.intersection);
+			if (a >= 0 && a < c)
+				b = 0;
+		}
+		count++;
+	}
+	return (b);
+}
+
+t_dpos3d	normale_cylcone(t_camera cam, t_big *big, double b, int d)
+{
+	big->objects[d].normale = normalize(big->objects[d].normale);
+	b = (scalar_product(cam.ang, big->objects[d].normale)
+		* b) + scalar_product(soustraction_v(cam.origin,
+		big->objects[d].origin), big->objects[d].normale);
+	if (big->objects[d].type == 3)
+	{
+		cam.intersection_d = soustraction_v(cam.intersection,
+			addition_v(big->objects[d].origin,
+			multiplication_v(normalize(big->objects[d].normale),
+			b)));
+	}
+	else if (big->objects[d].type == 4)
+	{
+		cam.intersection_d = soustraction_v(cam.intersection,
+			addition_v(big->objects[d].origin,
+			multiplication_v(big->objects[d].normale, (1 +
+			pow(big->objects[d].tangent, 2)) * b)));
+	}
+	return (cam.intersection_d);
+}
+
+t_dpos3d	normale_calc(t_camera cam, t_big *big, double b, int d)
+{
+	if (big->objects[d].type == 1)
+		cam.intersection_d = soustraction_v(cam.intersection,
+			big->objects[d].origin);
+	else if (big->objects[d].type == 2)
+		cam.intersection_d = (scalar_product(cam.ang,
+			big->objects[d].normale) < 0 ?
+			big->objects[d].normale : soustraction_v((t_dpos3d){0, 0, 0},
+			big->objects[d].normale));
+	else if (big->objects[d].type == 3)
+	{
+		cam.intersection_d = normale_cylcone(cam, big, b, d);
+	}
+	else if (big->objects[d].type == 4)
+	{
+		cam.intersection_d = normale_cylcone(cam, big, b, d);
+	}
+	return (cam.intersection_d);
+}
+
 t_camera	sending_rays(t_big *big, t_camera cam, t_dpos3d ang)
 {
-	double		a;
 	double		b;
-	double		c;
 	int			d;
-	int			count;
 
 	ang = normalize(ang);
-	d = test_intersections(big, &b, cam, ang);
+	d = test_inter(big, &b, cam, ang);
 	if (b >= 0)
 	{
 		cam.intersection = addition_v(cam.origin, multiplication_v(ang, b));
-		big->light.normale = soustraction_v(big->light.origin, cam.intersection);
-		if (big->objects[d].type == 1)
-			cam.intersection_d = soustraction_v(cam.intersection,
-				big->objects[d].origin);
-		else if (big->objects[d].type == 2)
-			cam.intersection_d = (scalar_product(ang,
-				big->objects[d].normale) < 0 ?
-				big->objects[d].normale : soustraction_v((t_dpos3d){0, 0, 0},
-				big->objects[d].normale));
-		else if (big->objects[d].type == 3)
-		{
-			big->objects[d].normale = normalize(big->objects[d].normale);
-			b = (scalar_product(ang, big->objects[d].normale)
-				* b) + scalar_product(soustraction_v(cam.origin,
-				big->objects[d].origin), big->objects[d].normale);
-			cam.intersection_d = soustraction_v(cam.intersection,
-				addition_v(big->objects[d].origin,
-				multiplication_v(normalize(big->objects[d].normale),
-				b)));
-		}
-		else if (big->objects[d].type == 4)
-		{
-			big->objects[d].normale =
-				normalize(big->objects[d].normale);
-			b = (scalar_product(ang, big->objects[d].normale)
-				* b) + scalar_product(soustraction_v(cam.origin,
-				big->objects[d].origin), big->objects[d].normale);
-			cam.intersection_d = soustraction_v(cam.intersection,
-				addition_v(big->objects[d].origin,
-				multiplication_v(big->objects[d].normale, (1 +
-				pow(big->objects[d].tangent, 2)) * b)));
-		}
+		big->light.normale =
+			soustraction_v(big->light.origin, cam.intersection);
+		cam.ang = copy_v(ang);
+		cam.intersection_d = normale_calc(cam, big, b, d);
 		big->light.normale = normalize(big->light.normale);
 		cam.intersection_d = normalize(cam.intersection_d);
 		if (big->objects[d].type != 0)
 			b = scalar_product(big->light.normale, cam.intersection_d) * 0.8;
 		if (b < 0)
 			b = 0;
-		count = 0;
-		c = big->intersec[1](big->light,
-			big->light.normale, 0, cam.intersection);
-		while (big->objects[count].type)
-		{
-			if (count != d)
-			{
-				a = big->intersec[big->objects[count].type - 1](big->objects[count],
-						big->light.normale, 0, cam.intersection);
-				if (a >= 0 && a < c)
-					b = 0;
-			}
-			count++;
-		}
+		b = light_intersections(big, d, cam, b);
 		cam.point_colo[0] = big->objects[d].color.b * (0.2 + b);
 		cam.point_colo[1] = big->objects[d].color.g * (0.2 + b);
 		cam.point_colo[2] = big->objects[d].color.r * (0.2 + b);
@@ -249,27 +272,26 @@ void		raytracing(t_camera cam, t_big *big)
 	t_dpos3d	ang;
 
 	ang = soustraction_v(cam.upleft, cam.origin);
-	cam.pas.second_p = multiplication_v(cam.vec_vertic, ((double)FOVX / (double)WINDOW_X));
+	cam.pas.second_p = multiplication_v(cam.vec_vertic,
+		((double)FOVX / (double)WINDOW_X));
 	cam.pas.first_p.x = cam.vec_horiz.x * ((double)FOVX / (double)WINDOW_X);
 	cam.pas.first_p.z = cam.vec_horiz.z * ((double)FOVX / (double)WINDOW_X);
-	screen.x = 0;
-	while (screen.x < WINDOW_X)
+	screen.x = -1;
+	while (++screen.x < WINDOW_X)
 	{
-		screen.y = 0;
+		screen.y = -1;
 		ang.y = cam.upleft.y - cam.origin.y;
 		ang.x = cam.upleft.x - cam.origin.x + (cam.pas.first_p.x * screen.x);
 		ang.z = cam.upleft.z - cam.origin.z + (cam.pas.first_p.z * screen.x);
-		while (screen.y < WINDOW_Y)
+		while (++screen.y < WINDOW_Y)
 		{
 			cam.point_colo[0] = 0;
 			cam.point_colo[1] = 0;
 			cam.point_colo[2] = 0;
 			cam = sending_rays(big, cam, ang);
 			print_pixel(&(big->img), &screen, cam.point_colo);
-			screen.y++;
 			ang = soustraction_v(ang, cam.pas.second_p);
 		}
-		screen.x++;
 	}
 }
 
@@ -298,79 +320,22 @@ t_camera	init_cam(t_camera cam)
 	return (cam);
 }
 
-int     quit_button(t_big *big)
+int			quit_button(t_big *big)
 {
 	free(big->objects);
 	exit(EXIT_SUCCESS);
 	return (0);
 }
 
-int			main()
+int			main(void)
 {
 	t_big		big;
 
-	big.objects = (t_primitiv*)malloc(sizeof(t_primitiv) * 7);
-	big.objects[0].type = 1;
-	big.objects[0].origin.x = 100;
-	big.objects[0].origin.y = 0;
-	big.objects[0].origin.z = 0;
-	big.objects[0].rayon = 30;
-	big.objects[0].color.r = 255;
-	big.objects[0].color.g = 123;
-	big.objects[0].color.b = 68;
-	big.objects[1].type = 1;
-	big.objects[1].origin.x = 85;
-	big.objects[1].origin.y = 20;
-	big.objects[1].origin.z = 0;
-	big.objects[1].rayon = 20;
-	big.objects[1].color.r = 123;
-	big.objects[1].color.g = 255;
-	big.objects[1].color.b = 68;
-	big.objects[2].type = 1;
-	big.objects[2].origin.x = 200;
-	big.objects[2].origin.y = 0;
-	big.objects[2].origin.z = 20;
-	big.objects[2].rayon = 30;
-	big.objects[2].color.r = 255;
-	big.objects[2].color.g = 255;
-	big.objects[2].color.b = 123;
-	big.objects[3].type = 1;
-	big.objects[3].origin.x = 0;
-	big.objects[3].origin.y = -10;
-	big.objects[3].origin.z = -40;
-	big.objects[3].rayon = 20;
-	big.objects[3].color.r = 123;
-	big.objects[3].color.g = 68;
-	big.objects[3].color.b = 255;
-	big.objects[4].type = 3;
-	big.objects[4].origin.x = 0;
-	big.objects[4].origin.y = 0;
-	big.objects[4].origin.z = -30;
-	big.objects[4].rayon = 10;
-	big.objects[4].normale.x = 0;
-	big.objects[4].normale.y = 10;
-	big.objects[4].normale.z = 0;
-	big.objects[4].color.r = 255;
-	big.objects[4].color.g = 0;
-	big.objects[4].color.b = 255;
-	big.objects[5].type = 4;
-	big.objects[5].origin.x = -30;
-	big.objects[5].origin.y = 30;
-	big.objects[5].origin.z = 50;
-	big.objects[5].tangent = 0.5;
-	big.objects[5].normale.x = 0;
-	big.objects[5].normale.y = 10;
-	big.objects[5].normale.z = 3;
-	big.objects[5].color.r = 255;
-	big.objects[5].color.g = 255;
-	big.objects[5].color.b = 255;
-	big.objects[6].type = 0;
-	big.camera.origin.x = -150;
-	big.camera.origin.y = 10;
-	big.camera.origin.z = 0;
-	big.camera.direction.x = 10;
-	big.camera.direction.y = 0;
-	big.camera.direction.z = 0;
+	big.camera.distance = 0;
+	ft_get_conf(&big);
+	if (big.camera.direction.x == 0 && big.camera.direction.y == 0 &&
+			big.camera.direction.z == 0)
+		exit(0);
 	big.camera.distance = 40;
 	big.intersec[0] = &sphere_c;
 	big.intersec[1] = &plan_c;

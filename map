@@ -1,0 +1,30 @@
+display_fun.c:			img->map[(((int)pos->x * 4) + a) +
+display_fun.c:				((int)pos->y * img->line_len)] = (char)colo[a];
+display_fun.c:		img->map[(((int)pos->x * 4) + a) +
+display_fun.c:			((int)pos->y * img->line_len)] = (char)0;
+display_fun.c:		img->map[(((int)pos->x * 4) + a) +
+display_fun.c:			((int)pos->y * img->line_len)] = (char)250;
+display_fun.c:	img->map[(((int)pos->x * 4) + a) +
+display_fun.c:		((int)pos->y * img->line_len)] = (char)0;
+display_fun.c:				BLOC_SIZE) / BLOC_SIZE) * img->spritesizex) * 4) + a) +
+display_fun.c:				((int)(((double)((int)img->pos->y - y_start) /
+display_fun.c:				slice) * img->spritesizey) * img->trash));
+display_fun.c:				BLOC_SIZE) / BLOC_SIZE) * img->spritesizex) * 4) + a) +
+display_fun.c:				((int)(((double)((int)img->pos->y - y_start) /
+display_fun.c:				slice) * img->spritesizey) * img->trash));
+display_fun.c:			colo[a] = (int)((img->ang < 180 ? img->sp1 : img->sp2)[res]);
+display_fun.c:			colo[a] = (int)((img->ang < 270 && img->ang > 90 ? img->sp3 :
+display_fun.c:						img->sp4)[res]);
+display_fun.c:		img->pos = pos;
+raytracing.c:	img->ang = player.direction - (FOV / 2);
+raytracing.c:	img->ang += (img->ang < 0 ? 360 : 0);
+raytracing.c:		ray.direction = img->ang;
+raytracing.c:					img->ang));
+raytracing.c:		img->ang += pas;
+raytracing.c:		img->ang -= (img->ang > 360 ? 360 : 0);
+win_crea.c:	img->maxx = WINDOW_X;
+win_crea.c:	img->maxy = WINDOW_Y;
+win_crea.c:	mlx->win = mlx_new_window(mlx->mlx, img->maxx, img->maxy, "RT v1.0");
+win_crea.c:	mlx->image = mlx_new_image(mlx->mlx, img->maxx, img->maxy);
+win_crea.c:	img->map = mlx_get_data_addr(mlx->image,
+win_crea.c:			            &img->bpp, &img->line_len, &img->endian);

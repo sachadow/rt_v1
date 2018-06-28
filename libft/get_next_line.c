@@ -5,79 +5,60 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/12/05 14:38:37 by sderet            #+#    #+#             */
-/*   Updated: 2017/12/21 17:50:21 by sderet           ###   ########.fr       */
+/*   Created: 2018/06/28 16:55:34 by sderet            #+#    #+#             */
+/*   Updated: 2018/06/28 16:55:39 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include "libft.h"
 
-static int	ft_read(char **str, int fd)
+static int		ft_i(char *str)
 {
-	int		nb_read;
-	char	buffer[BUFF_SIZE + 1];
-	char	*tmp;
+	int i;
 
-	nb_read = read(fd, buffer, BUFF_SIZE);
-	if (nb_read < 0)
-		return (-1);
-	buffer[nb_read] = '\0';
-	tmp = *str;
-	*str = ft_strjoin(*str, buffer);
-	if (*tmp)
-		free(tmp);
-	return (nb_read);
+	i = 0;
+	while (str[i] != '\n' && str[i] != '\0')
+		i++;
+	return (i);
 }
 
-static int	get_line(char **buff, char **line, char *tmpchar)
+static void		ft_if_one(char **str, char **line, int i)
 {
-	char	*tmp;
-	int		state;
-
-	state = 0;
-	if (*tmpchar == '\n')
-		state = 1;
-	*tmpchar = 0;
-	*line = ft_strjoin("", *buff);
-	if (state == 0 && ft_strlen(*buff))
-	{
-		*buff = ft_strnew(1);
-		return (1);
-	}
-	else if (state == 0 && !(ft_strlen(*buff)))
-		return (0);
-	tmp = *buff;
-	*buff = ft_strjoin(tmpchar + 1, "");
-	free(tmp);
-	return (1);
+	*line = ft_strsub(*str, 0, i);
+	*str = ft_strsubf(*str, i + 1, ((ft_strlen(*str) - i)) - 1);
 }
 
-int			get_next_line(const int fd, char **line)
+static void		ft_if_two(char **str, char **line)
 {
-	static char	*buff = 0;
-	char		*tmpchar;
-	int			nb_read;
+	*line = ft_strdup(*str);
+	ft_strdel(str);
+}
 
-	if (line == NULL || BUFF_SIZE < 0)
+int				get_next_line(const int fd, char **line)
+{
+	int			ret;
+	char		buf[BUFF_SIZE + 1];
+	static char	*str;
+
+	ret = 0;
+	if (fd < 0 || read(fd, buf, 0) < 0 || line == NULL)
 		return (-1);
-	*line = 0;
-	if (buff == 0)
-		buff = "";
-	nb_read = BUFF_SIZE;
-	while (line)
+	if (str == NULL || ft_strchr(str, '\n') == NULL)
 	{
-		tmpchar = buff;
-		while (*tmpchar || nb_read < BUFF_SIZE)
+		str = (!str) ? ft_strnew(0) : str;
+		while ((ret = read(fd, buf, BUFF_SIZE)))
 		{
-			if (*tmpchar == 0 || *tmpchar == '\n' || *tmpchar == EOF)
-				return (get_line(&buff, line, tmpchar));
-			tmpchar++;
+			buf[ret] = '\0';
+			str = ft_strjoinfree(str, buf, 1);
+			if (ft_strchr(str, '\n') != NULL)
+				break ;
 		}
-		if ((nb_read = ft_read(&buff, fd)) == -1)
-			return (-1);
+		if (ret < BUFF_SIZE && str[0] == '\0')
+			return (0);
 	}
-	return (-1);
+	if (str && ft_strchr(str, '\n') != NULL)
+		ft_if_one(&str, line, ft_i(str));
+	else if (str && ft_strchr(str, '\n') == NULL)
+		ft_if_two(&str, line);
+	return (1);
 }

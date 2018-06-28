@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/25 17:51:03 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/28 18:44:33 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include "libft/libft.h"
 # include "minilibx/mlx.h"
 # include <math.h>
+# include <stdlib.h>
+# include <fcntl.h>
 
 # define ABS(x) ((x) > 0 ? x : -(x))
 # define RAD(x) ((double)(x) / 57.3)
@@ -98,7 +100,7 @@ typedef	struct	s_dpas
 	t_dpos3d	second_p;
 }				t_dpas;
 
-typedef struct	s_char
+typedef struct	s_camera
 {
 	t_dpos3d	origin;
 	t_dpos3d	direction;
@@ -108,6 +110,7 @@ typedef struct	s_char
 	t_dpos3d	vec_vertic;
 	int			distance;
 	t_dpas		pas;
+	t_dpos3d	ang;
 	t_dpos3d	intersection;
 	t_dpos3d	intersection_d;
 	t_dpos3d	relative;
@@ -147,14 +150,6 @@ typedef struct	s_big
 
 void			init_big(t_big *big);
 
-char			*genl(char *filename);
-
-/*
-** Function for parsing. Completes the map given as a paraneter.
-*/
-
-void			*youpi(char *filename, t_map *map);
-
 /*
 **	Prints one pixel on pos in img. Colors are determined by
 **	the first 3 ints in col. They are, in order, Blue Green and
@@ -163,21 +158,24 @@ void			*youpi(char *filename, t_map *map);
 void			print_pixel(t_image *img, t_pos *pos, int *colo);
 
 /*
-**	Prints one pixel on pos in img. Color is based on
-**	different settings, in order to make a good looking
-**	fractol.
-*/
-void			print_pixelc(t_image *img, t_pos *pos, t_dpos *c, int slice);
-
-/*
 **	Creates the image img.
 */
 void			window_creation(t_image *img, t_mmlx *mlx, t_big *big);
 
 int				std_err(int err, t_map *map);
 
-int				check_wall(t_pos pos, t_map map);
+int				search_param_objet(char *test, t_big *b);
 
-void			clean_map(t_image *img);
+int				search_param_light(char *test, t_big *b);
+
+void			ft_get_conf(t_big *big);
+
+int				get_val_pos(char *position, t_dpos3d *pos);
+
+void			get_val_obj(char *objet, t_big *b, int index);
+
+int				checktan(char *objet, t_big *b, int index);
+
+int				get_val_color(char *color, t_color *couleur);
 
 #endif

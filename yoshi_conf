@@ -1,0 +1,72 @@
+no
+Camera:{
+    position:-130,0,-45;
+    direction:15,0,6;
+    }
+Light:{
+    position:-100,30,-20;
+}
+Objet:{
+    number:10;
+    (
+        type:1;
+        position:0,10,0;
+        color:123,255,63;
+		rayon:20;
+    )
+    (
+        type:1;
+        position:-15,23,5;
+        color:123,255,63;
+		rayon:8;
+    )
+    (
+        type:1;
+        position:-15,23,-5;
+        color:123,255,63;
+		rayon:8;
+    )
+    (
+        type:1;
+        position:-37,0,0;
+        color:123,255,63;
+		rayon:18;
+    )
+    (
+        type:1;
+        position:-19,20,5;
+        color:255,255,255;
+		rayon:5;
+    )
+    (
+        type:1;
+        position:-19,20,-5;
+        color:255,255,255;
+		rayon:5;
+    )
+    (
+        type:1;
+        position:-22,19,5;
+        color:30,30,180;
+		rayon:3;
+    )
+    (
+        type:1;
+        position:-22,19,-5;
+        color:30,30,180;
+		rayon:3;
+    )
+    (
+        type:3;
+        position:0,-5,0;
+		normale:10,3,0;
+        color:255,0,0;
+		rayon:3;
+    )
+    (
+        type:2;
+        position:20,0,0;
+		normale:1,0,0;
+        color:0,0,0;
+    )
+}
