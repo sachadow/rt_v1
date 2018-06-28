@@ -6,13 +6,14 @@
 #    By: sderet <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/13 15:33:21 by sderet            #+#    #+#              #
-#    Updated: 2018/06/28 18:44:53 by sderet           ###   ########.fr        #
+#    Updated: 2018/06/28 20:49:44 by sderet           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = rtv1
 SRCS = true_main.c display_fun.c win_crea.c color.c get_conf.c light.c \
-	   parser_objet.c test_obj.c tang.c
+	   parser_objet.c test_obj.c tang.c primitives_intersection.c \
+	   intersections_general.c vec_fun.c
 HEAD = rtv1.h
 LIBS = -L./libft -lft -L./minilibx -lmlx
 FRAMEW = -framework OpenGL -framework Appkit

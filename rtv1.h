@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 18:44:33 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/28 20:51:37 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <math.h>
 # include <stdlib.h>
 # include <fcntl.h>
+# include <float.h>
 
 # define ABS(x) ((x) > 0 ? x : -(x))
 # define RAD(x) ((double)(x) / 57.3)
@@ -165,6 +166,40 @@ void			window_creation(t_image *img, t_mmlx *mlx, t_big *big);
 int				std_err(int err, t_map *map);
 
 int				search_param_objet(char *test, t_big *b);
+
+double			scalar_product(t_dpos3d a, t_dpos3d b);
+
+t_dpos3d		copy_v(t_dpos3d pos);
+
+t_dpos3d		addition_v(t_dpos3d pos1, t_dpos3d pos2);
+
+t_dpos3d		soustraction_v(t_dpos3d pos1, t_dpos3d pos2);
+
+t_dpos3d		multiplication_v(t_dpos3d pos1, double a);
+
+double			cone_c(t_primitiv cone, t_dpos3d ang, double a,
+		t_dpos3d origin);
+
+double			cyl_c(t_primitiv cyl, t_dpos3d ang, double a,
+		t_dpos3d origin);
+
+double			plan_c(t_primitiv plan, t_dpos3d ang, double a,
+		t_dpos3d origin);
+
+double			sphere_c(t_primitiv sphere, t_dpos3d ang, double a,
+		t_dpos3d origin);
+
+t_dpos3d		normalize(t_dpos3d pos);
+
+t_camera		sending_rays(t_big *big, t_camera cam, t_dpos3d ang);
+
+t_dpos3d		normale_calc(t_camera cam, t_big *big, double b, int d);
+
+t_dpos3d		normale_cylcone(t_camera cam, t_big *big, double b, int d);
+
+double			light_intersections(t_big *big, int d, t_camera cam, double b);
+
+double			test_inter(t_big *big, double *b, t_camera cam, t_dpos3d ang);
 
 int				search_param_light(char *test, t_big *b);
 
