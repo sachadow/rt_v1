@@ -6,7 +6,7 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/25 15:07:26 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/29 15:42:08 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 16:44:00 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,37 +59,18 @@ int		put_obj(char *objet, t_big *b, int index)
 
 int		test_obj(char *objet, t_big *b, int len)
 {
-	int		test;
-	int		i;
-	char	*obj;
-	int		index;
+	int		*val;
 
-	i = -1;
-	index = 0;
-	while (objet[++i])
-	{
-		if (objet[i] == '(')
-		{
-			test = i;
-			while (objet[++i] && test != 0)
-			{
-				if (objet[i] == '(')
-					return (std_err(0));
-				if (objet[i] == ')')
-				{
-					obj = ft_strsub(objet, test + 1, i - test - 1);
-					put_obj(obj, b, index);
-					index++;
-					test = 0;
-					if (index > len)
-						return (std_err(0));
-				}
-			}
-		}
-	}
-	if (index != len)
+	if (!(val = (int*)malloc(sizeof(int) * 3)))
 		return (std_err(0));
-	b->objects[index].type = 0;
+	val[0] = -1;
+	val[2] = 0;
+	while (objet[++val[0]])
+		object(objet, val, len, b);
+	if (val[2] != len)
+		return (std_err(0));
+	b->objects[val[2]].type = 0;
+	free(val);
 	return (0);
 }
 

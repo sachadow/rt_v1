@@ -1,0 +1,41 @@
+no
+Camera:{
+    position:-150,20,0;
+    direction:15,0,0;
+    }
+Light:{
+    position:-100,30,-50;
+}
+Objet:{
+    number:5;
+    (
+        type:1;
+        position:0,-10,0;
+		rayon:60;
+        color:255,255,255;
+    )
+    (
+        type:1;
+        position:0,30,0;
+		rayon:50;
+        color:255,255,255;
+    )
+    (
+        type:1;
+        position:-35,30,-15;
+		rayon:15;
+        color:0,0,0;
+    )
+    (
+        type:1;
+        position:-35,30,15;
+		rayon:15;
+        color:0,0,0;
+    )
+    (
+        type:1;
+        position:-47,30,17;
+		rayon:5;
+        color:180,210,255;
+    )
+}

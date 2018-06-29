@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/29 15:24:25 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 16:42:42 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,5 +212,13 @@ void			get_val_obj(char *objet, t_big *b, int index);
 int				checktan(char *objet, t_big *b, int index);
 
 int				get_val_color(char *color, t_color *couleur);
+
+int				test_position_cam(char *camera, t_big *b);
+
+int				test_direction_cam(char *camera, t_big *b);
+
+int				object(char *objet, int *val, int len, t_big *b);
+
+int				put_obj(char *objet, t_big *b, int index);
 
 #endif
