@@ -6,7 +6,7 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/25 18:11:27 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/28 19:06:56 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 16:01:21 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int		checkpos(char *objet, t_big *b, int index)
 		{
 			position = ft_strsub(position, 9, i - 8);
 			i = get_val_pos(position, &(b->objects[index].origin));
+			free(position);
 			if (i == 1)
 				return (0);
 			else
@@ -52,6 +53,7 @@ int		checknorm(char *objet, t_big *b, int index)
 		{
 			normale = ft_strsub(normale, 8, i - 7);
 			i = get_val_pos(normale, &(b->objects[index].normale));
+			free(normale);
 			if (i == 1)
 				return (0);
 			else
@@ -77,7 +79,7 @@ int		checkcolor(char *objet, t_big *b, int index)
 		{
 			color = ft_strsub(color, 6, i - 5);
 			i = get_val_color(color, &(b->objects[index].color));
-			return(i);
+			return (i);
 		}
 		i++;
 	}
@@ -89,11 +91,11 @@ int		checkray(char *objet, t_big *b, int index)
 	char	*rayon;
 	int		i;
 
-	i = 0;
+	i = -1;
 	rayon = ft_strstr(objet, "rayon:");
 	if (rayon == NULL)
 		return (1);
-	while (rayon[i])
+	while (rayon[++i])
 	{
 		if (rayon[i] == ';')
 		{
@@ -101,20 +103,14 @@ int		checkray(char *objet, t_big *b, int index)
 			b->objects[index].rayon = ft_atoi(rayon);
 			i = 0;
 			if (rayon[i] > 57 && rayon[i] < 48)
-			{
-				free(rayon);
-				return (1);
-			}
+				return (std_err(0));
 			while (rayon[i] > 47 && rayon[i] < 58)
 				i++;
 			if (rayon[i] != ';')
-			{
-				free(rayon);
-				return (1);
-			}
+				return (std_err(0));
+			free(rayon);
 			return (0);
 		}
-		i++;
 	}
 	return (1);
 }
@@ -126,17 +122,13 @@ void	get_val_obj(char *objet, t_big *b, int index)
 	erreur = 0;
 	erreur += checkpos(objet, b, index);
 	erreur += checkcolor(objet, b, index);
-
 	if (b->objects[index].type == 1 || b->objects[index].type == 3)
 		erreur += checkray(objet, b, index);
 	if (b->objects[index].type > 1)
 		erreur += checknorm(objet, b, index);
 	if (b->objects[index].type == 4)
 		erreur += checktan(objet, b, index);
-
 	if (erreur > 0)
-	{
-		free(objet);
-		exit(0);
-	}
+		std_err(0);
+	free(objet);
 }
