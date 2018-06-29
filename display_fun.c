@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:11:13 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 16:17:03 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 15:24:43 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,15 @@ void	print_pixel(t_image *img, t_pos *pos, int *colo)
 		((int)pos->y * img->line_len)] = (char)0;
 }
 
-int		std_err(int err, t_map *map)
+int		std_err(int err)
 {
-	int a;
-
-	if (map != NULL && map->map != NULL)
-	{
-		a = -1;
-		while (map->map[++a] != 0)
-			free(map->map[a]);
-		free(map->map);
-	}
 	if (err == 1)
 		ft_putendl("usage :	./rtv1");
-	if (err == 2)
+	else
 	{
 		ft_putstr("Error : source file format may be incorrect or ");
 		ft_putendl("file doesn't exist.");
 	}
-	return (1);
+	exit(0);
+	return (0);
 }

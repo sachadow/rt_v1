@@ -6,7 +6,7 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 20:51:37 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 15:24:25 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void			print_pixel(t_image *img, t_pos *pos, int *colo);
 */
 void			window_creation(t_image *img, t_mmlx *mlx, t_big *big);
 
-int				std_err(int err, t_map *map);
+int				std_err(int err);
 
 int				search_param_objet(char *test, t_big *b);
 

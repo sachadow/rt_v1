@@ -6,7 +6,7 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/26 06:58:27 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/28 16:49:24 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 14:50:49 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int		get_val_color(char *color, t_color *couleur)
 	int i;
 
 	i = 0;
-	//printf("color = %s\n", color);
 	couleur->r = ft_atoi(color);
 	if (color[i] > 57 && color[i] < 48)
 		return (1);

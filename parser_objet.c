@@ -6,7 +6,7 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/25 15:07:26 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/28 17:09:00 by sderet           ###   ########.fr       */
+/*   Updated: 2018/06/29 15:29:30 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,28 +21,16 @@ int		test_number_object(char *objet)
 	i = 7;
 	number = ft_strstr(objet, "number:");
 	if (number == NULL)
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	if (number[i] > 57 && number[i] < 48)
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	len = ft_atoi(number + i);
 	while (number[i] < 58 && number[i] > 47)
 		i++;
 	if (number[i] != ';')
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	if (len == 0)
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	return (len);
 }
 
@@ -52,26 +40,18 @@ int		put_obj(char *objet, t_big *b, int index)
 	int		nbr;
 	int		i;
 
+	nbr = 0;
 	i = 5;
 	type = ft_strstr(objet, "type:");
 	if (type == NULL)
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	if (type[i] > 48 && type[i] < 53)
 		nbr = type[i] - 48;
 	else
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	i++;
 	if (type[i] != ';')
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	b->objects[index].type = nbr;
 	get_val_obj(objet, b, index);
 	return (0);
@@ -84,19 +64,17 @@ int		test_obj(char *objet, t_big *b, int len)
 	char	*obj;
 	int		index;
 
-	i = 0;
+	i = -1;
 	index = 0;
-	while (objet[i])
+	while (objet[++i])
 	{
-		test = 0;
 		if (objet[i] == '(')
 		{
 			test = i;
-			i++;
-			while (objet[i] && test != 0)
+			while (objet[++i] && test != 0)
 			{
 				if (objet[i] == '(')
-					exit(0);
+					return (std_err(0));
 				if (objet[i] == ')')
 				{
 					obj = ft_strsub(objet, test + 1, i - test - 1);
@@ -104,21 +82,13 @@ int		test_obj(char *objet, t_big *b, int len)
 					index++;
 					test = 0;
 					if (index > len)
-					{
-						free(objet);
-						exit(0);
-					}
+						return (std_err(0));
 				}
-				i++;
 			}
 		}
-		i++;
 	}
 	if (index != len)
-	{
-		free(objet);
-		exit(0);
-	}
+		return (std_err(0));
 	b->objects[index].type = 0;
 	return (0);
 }
@@ -131,7 +101,7 @@ int		test_objet(char *objet, t_big *b)
 	if (!(b->objects = (t_primitiv *)malloc(sizeof(t_primitiv) * (len + 1))))
 	{
 		free(objet);
-		exit(0);
+		return (std_err(0));
 	}
 	test_obj(objet, b, len);
 	return (0);
@@ -145,11 +115,11 @@ int		search_param_objet(char *test, t_big *b)
 	i = 7;
 	objet = ft_strstr(test, "Objet:{");
 	if (objet == NULL)
-		exit(0);
+		return (std_err(0));
 	while (objet[i] && i >= 0)
 	{
 		if (objet[i] == '{')
-			exit(0);
+			return (std_err(0));
 		if (objet[i] == '}')
 		{
 			objet = ft_strsub(objet, 7, i - 7);
@@ -159,5 +129,6 @@ int		search_param_objet(char *test, t_big *b)
 		}
 		i++;
 	}
-	exit(0);
+	return (std_err(0));
+	return (0);
 }
