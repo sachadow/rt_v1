@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 double	change_less_zero(char *tan)
 {

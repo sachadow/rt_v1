@@ -6,11 +6,11 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/19 15:53:26 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/29 16:23:07 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 16:23:01 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 int		get_val_pos(char *position, t_dpos3d *pos)
 {

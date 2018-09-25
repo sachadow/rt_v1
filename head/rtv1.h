@@ -6,15 +6,15 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/18 16:36:53 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/29 16:42:42 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 18:49:38 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RTV1_H
 # define RTV1_H
 
-# include "libft/libft.h"
-# include "minilibx/mlx.h"
+# include "../libft/libft.h"
+# include "../minilibx/mlx.h"
 # include <math.h>
 # include <stdlib.h>
 # include <fcntl.h>
@@ -26,6 +26,11 @@
 # define WINDOW_Y 800
 # define FOVX 60
 # define FOVY 60
+# define SPHERE 1
+# define PLAN 2
+# define i_CYL 3
+# define i_CONE 4
+# define DISK 5
 
 typedef struct	s_pos
 {
@@ -103,6 +108,8 @@ typedef	struct	s_dpas
 
 typedef struct	s_camera
 {
+	double		xy_angle;
+	double		xz_angle;
 	t_dpos3d	origin;
 	t_dpos3d	direction;
 	t_dpos3d	upleft;
@@ -146,7 +153,7 @@ typedef struct	s_big
 	char		*name;
 	t_primitiv	*objects;
 	t_primitiv	light;
-	double		(*intersec[4])(t_primitiv, t_dpos3d, double, t_dpos3d);
+	double		(*intersec[5])(t_primitiv, t_dpos3d, double, t_dpos3d);
 }				t_big;
 
 void			init_big(t_big *big);
@@ -177,15 +184,38 @@ t_dpos3d		soustraction_v(t_dpos3d pos1, t_dpos3d pos2);
 
 t_dpos3d		multiplication_v(t_dpos3d pos1, double a);
 
+/*
+**	Returns the distance from the origin to the intersection to a
+**	cone primitive (-1 if there are no intersections).
+*/
 double			cone_c(t_primitiv cone, t_dpos3d ang, double a,
 		t_dpos3d origin);
 
+/*
+**	Returns the distance from the origin to the intersection to a
+**	cylinder primitive (-1 if there are no intersections).
+*/
 double			cyl_c(t_primitiv cyl, t_dpos3d ang, double a,
 		t_dpos3d origin);
 
+/*
+**	Returns the distance from the origin to the intersection to a
+**	plane primitive (-1 if there are no intersections).
+*/
 double			plan_c(t_primitiv plan, t_dpos3d ang, double a,
 		t_dpos3d origin);
 
+/*
+**	Returns the distance from the origin to the intersection to a
+**	disk primitive (-1 if there are no intersections).
+*/
+double			disk_c(t_primitiv disk, t_dpos3d ang, double a,
+		t_dpos3d origin);
+
+/*
+**	Returns the distance from the origin to the intersection to a
+**	sphere primitive (-1 if there are no intersections).
+*/
 double			sphere_c(t_primitiv sphere, t_dpos3d ang, double a,
 		t_dpos3d origin);
 

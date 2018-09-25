@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 void	get_val_color2(char *color, t_color *couleur, int i)
 {

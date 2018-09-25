@@ -6,11 +6,11 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/29 16:16:00 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/29 16:22:44 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 15:28:13 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 int		test_position_cam(char *camera, t_big *b)
 {

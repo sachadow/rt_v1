@@ -6,11 +6,11 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/28 16:25:49 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 20:42:56 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 19:00:28 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 t_dpos3d	normalize(t_dpos3d pos)
 {

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 #include <stdlib.h>
 
 void	print_pixel(t_image *img, t_pos *pos, int *colo)

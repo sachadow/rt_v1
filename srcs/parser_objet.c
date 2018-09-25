@@ -6,11 +6,11 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/25 15:07:26 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/29 16:44:00 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 18:54:22 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 int		test_number_object(char *objet)
 {
@@ -45,7 +45,7 @@ int		put_obj(char *objet, t_big *b, int index)
 	type = ft_strstr(objet, "type:");
 	if (type == NULL)
 		return (std_err(0));
-	if (type[i] > 48 && type[i] < 53)
+	if (type[i] > 48 && type[i] < 54)
 		nbr = type[i] - 48;
 	else
 		return (std_err(0));

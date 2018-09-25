@@ -6,11 +6,11 @@
 /*   By: asarasy <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/25 18:11:27 by asarasy           #+#    #+#             */
-/*   Updated: 2018/06/29 16:01:21 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 19:09:01 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 int		checkpos(char *objet, t_big *b, int index)
 {
@@ -122,7 +122,8 @@ void	get_val_obj(char *objet, t_big *b, int index)
 	erreur = 0;
 	erreur += checkpos(objet, b, index);
 	erreur += checkcolor(objet, b, index);
-	if (b->objects[index].type == 1 || b->objects[index].type == 3)
+	if (b->objects[index].type == 1 || b->objects[index].type == 3 ||
+			b->objects[index].type == 5)
 		erreur += checkray(objet, b, index);
 	if (b->objects[index].type > 1)
 		erreur += checknorm(objet, b, index);

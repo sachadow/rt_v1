@@ -1,0 +1,55 @@
+no
+Camera:{
+    position:-150,20,0;
+    direction:15,0,0;
+    }
+Light:{
+    position:-100,30,-50;
+}
+Objet:{
+    number:6;
+    (
+		//Plan du dessous
+        type:2;
+        position:0,-10,0;
+		normale:0,1,0;
+        color:255,0,0;
+    )
+    (
+		//Plan du fond
+        type:2;
+        position:0,0,-70;
+		normale:0,0,1;
+        color:0,255,0;
+    )
+    (
+		//Cylindre de droite
+        type:3;
+        position:0,0,70;
+		normale:2,4,1;
+		rayon:10;
+        color:255,255,255;
+    )
+    (
+		//Plan de gauche
+        type:2;
+        position:50,0,0;
+		normale:1,0,0;
+		color:180,0,180;
+    )
+    (
+		//Sphere de gauche
+        type:1;
+        position:-40,0,-20;
+		rayon:20;
+        color:180,180,0;
+    )
+    (
+		//Cone du centre
+        type:4;
+        position:0,0,20;
+		normale:0,1,-1;
+		tan:3;
+        color:0,180,180;
+    )
+}

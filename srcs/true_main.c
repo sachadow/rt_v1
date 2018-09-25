@@ -6,14 +6,14 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 15:18:55 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 20:49:06 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 19:01:16 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <float.h>
 #include <math.h>
-#include "rtv1.h"
-#include "libft/libft.h"
+#include "../head/rtv1.h"
+#include "../libft/libft.h"
 #include <stdlib.h>
 
 void		raytracing(t_camera cam, t_big *big)
@@ -81,8 +81,16 @@ int			main(void)
 {
 	t_big		big;
 
+	big.camera.xy_angle = 90;
+	big.camera.xz_angle = 0;
+
 	big.camera.distance = 0;
 	ft_get_conf(&big);
+	big.camera.xy_angle = RAD(big.camera.xy_angle);
+	big.camera.xz_angle = RAD(big.camera.xz_angle);
+	big.camera.direction.x = cos(big.camera.xz_angle) * cos(big.camera.xy_angle);
+	big.camera.direction.z = sin(big.camera.xz_angle) * cos(big.camera.xy_angle);
+	big.camera.direction.y = sin(big.camera.xy_angle);
 	if (big.camera.direction.x == 0 && big.camera.direction.y == 0 &&
 			big.camera.direction.z == 0)
 		exit(0);
@@ -91,6 +99,7 @@ int			main(void)
 	big.intersec[1] = &plan_c;
 	big.intersec[2] = &cyl_c;
 	big.intersec[3] = &cone_c;
+	big.intersec[4] = &disk_c;
 	big.camera = init_cam(big.camera);
 	big.mlx.mlx = mlx_init();
 	window_creation(&(big.img), &(big.mlx), &big);

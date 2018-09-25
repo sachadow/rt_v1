@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
-#include "minilibx/mlx.h"
+#include "../head/rtv1.h"
+#include "../minilibx/mlx.h"
 #include <stdlib.h>
 #include <fcntl.h>
 

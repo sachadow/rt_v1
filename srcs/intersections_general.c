@@ -6,11 +6,11 @@
 /*   By: sderet <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/28 16:26:30 by sderet            #+#    #+#             */
-/*   Updated: 2018/06/28 20:46:13 by sderet           ###   ########.fr       */
+/*   Updated: 2018/09/25 18:58:38 by sderet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "../head/rtv1.h"
 
 double		test_inter(t_big *big, double *b, t_camera cam, t_dpos3d ang)
 {
@@ -89,7 +89,7 @@ t_dpos3d	normale_calc(t_camera cam, t_big *big, double b, int d)
 	if (big->objects[d].type == 1)
 		cam.intersection_d = soustraction_v(cam.intersection,
 			big->objects[d].origin);
-	else if (big->objects[d].type == 2)
+	else if (big->objects[d].type == 2 || big->objects[d].type == 5)
 		cam.intersection_d = (scalar_product(cam.ang,
 			big->objects[d].normale) < 0 ?
 			big->objects[d].normale : soustraction_v((t_dpos3d){0, 0, 0},
